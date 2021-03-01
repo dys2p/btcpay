@@ -69,7 +69,7 @@ func TestInvoice(t *testing.T) {
 	}
 }
 
-func Test1PaymentRequest(t *testing.T) {
+func TestPaymentRequest(t *testing.T) {
 
 	api, err := LoadAPI("api.json")
 	if err != nil {

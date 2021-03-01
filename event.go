@@ -14,7 +14,7 @@ import (
 
 type EventType string
 
-// An invoice is considered "settled" if it has been "paid" in time (seen in the mempool before the invoice time expired) and the full amount has been paid and the transaction has been confirmed (got n confirmations on the blockchain, see SpeedPolicy).
+// An invoice is considered "settled" if it has been "paid" in time (seen on the blockchain before the invoice time expired) and the full amount has been paid and the transaction has been confirmed (got n confirmations on the blockchain, see SpeedPolicy).
 const (
 	EventInvoiceCreated         EventType = "InvoiceCreated"
 	EventInvoiceExpired                   = "InvoiceExpired"
