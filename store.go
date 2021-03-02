@@ -55,7 +55,7 @@ func (store *Store) DoRequest(method string, path string, body io.Reader) (*http
 		return nil, err
 	}
 
-	req.Header.Add("Authorization", fmt.Sprintf("token %s", store.API.UserAuthToken))
+	req.Header.Add("Authorization", fmt.Sprintf("token %s", store.API.UserAPIKey))
 	req.Header.Add("Content-Type", "application/json")
 
 	return (&http.Client{

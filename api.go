@@ -7,8 +7,8 @@ import (
 )
 
 type API struct {
-	URI           string `json:"uri"`           // without "/api" and without trailing slash
-	UserAuthToken string `json:"userAuthToken"` // without "token" prefix, to be created in the user settings (not in the store settings)
+	URI        string `json:"uri"`        // without "/api" and without trailing slash
+	UserAPIKey string `json:"userAPIKey"` // to be created in the BTCPay Server user settings (not in the store settings)
 }
 
 // LoadAPI unmarshals a json config file into an API. If the file doesn't exist, it is created using CreateAPIConfig.
