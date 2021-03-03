@@ -32,9 +32,9 @@ type Invoice struct {
 	InvoiceRequest
 	ID                   string `json:"id"`
 	CheckoutLink         string `json:"checkoutLink"`
-	CreatedTime          int    `json:"createdTime"`
-	ExpirationTime       int    `json:"expirationTime"`
-	MonitoringExpiration int    `json:"monitoringExpiration"`
+	CreatedTime          int64  `json:"createdTime"`
+	ExpirationTime       int64  `json:"expirationTime"`
+	MonitoringExpiration int64  `json:"monitoringExpiration"`
 	Status               string `json:"status"`
 	AdditionalStatus     string `json:"additionalStatus"`
 }
