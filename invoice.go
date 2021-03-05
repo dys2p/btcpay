@@ -8,14 +8,12 @@ import (
 	"net/http"
 )
 
-type InvoiceStatus string
-
 const (
-	InvoiceNew        InvoiceStatus = "New"
-	InvoiceProcessing               = "Processing"
-	InvoiceExpired                  = "Expired"
-	InvoiceInvalid                  = "Invalid"
-	InvoiceSettled                  = "Settled"
+	InvoiceNew        string = "New"
+	InvoiceProcessing        = "Processing"
+	InvoiceExpired           = "Expired"
+	InvoiceInvalid           = "Invalid"
+	InvoiceSettled           = "Settled"
 )
 
 // SpeedPolicy defines when an invoice is considered confirmed.
