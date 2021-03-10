@@ -38,6 +38,10 @@ func CreateAPIConfig(jsonPath string) error {
 	return fmt.Errorf("created empty config file: %s", jsonPath)
 }
 
+func (api *API) InvoiceCheckoutLink(id string) string {
+	return fmt.Sprintf("%s/i/%s", api.URI, id)
+}
+
 func (api *API) PaymentRequestLink(id string) string {
 	return fmt.Sprintf("%s/payment-requests/%s", api.URI, id)
 }
