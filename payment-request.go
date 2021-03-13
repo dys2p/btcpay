@@ -35,7 +35,7 @@ type PaymentRequestRequest struct {
 	Email                     string  `json:"email,omitempty"`
 	EmbeddedCSS               string  `json:"embeddedCSS,omitempty"` // CSS up to 500 bytes
 	ExpiryDate                string  `json:"expiryDate,omitempty"`  // RFC3339 date (in contrast to the docs which say int64)
-	Title                     string  `json:"title"`
+	Title                     string  `json:"title"`                 // required
 }
 
 func (req *PaymentRequestRequest) SetExpiryDays(days int) {

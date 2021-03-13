@@ -38,7 +38,7 @@ type Invoice struct {
 }
 
 type InvoiceRequest struct {
-	Amount          float64 `json:"amount"`
+	Amount          float64 `json:"amount,string"`
 	Currency        string  `json:"currency"`
 	InvoiceMetadata `json:"metadata,omitempty"`
 	InvoiceCheckout `json:"checkout,omitempty"`
