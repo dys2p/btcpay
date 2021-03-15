@@ -77,8 +77,19 @@ func (store *Store) CreateInvoice(request *InvoiceRequest) (*Invoice, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("response status: %d: %s", resp.StatusCode, body)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// ok
+	case http.StatusUnauthorized: // 401, "Unauthorized" should be "Unauthenticated"
+		return nil, ErrUnauthenticated
+	case http.StatusForbidden:
+		return nil, ErrUnauthorized
+	case http.StatusBadRequest:
+		return nil, ErrBadRequest
+	case http.StatusNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
 	}
 
 	var invoice = &Invoice{}
@@ -98,8 +109,19 @@ func (store *Store) GetInvoice(id string) (*Invoice, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("response status: %d: %s", resp.StatusCode, body)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// ok
+	case http.StatusUnauthorized: // 401, "Unauthorized" should be "Unauthenticated"
+		return nil, ErrUnauthenticated
+	case http.StatusForbidden:
+		return nil, ErrUnauthorized
+	case http.StatusBadRequest:
+		return nil, ErrBadRequest
+	case http.StatusNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
 	}
 
 	var invoice = &Invoice{}

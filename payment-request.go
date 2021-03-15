@@ -60,8 +60,19 @@ func (store *Store) CreatePaymentRequest(request *PaymentRequestRequest) (*Payme
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("response status: %d: %s", resp.StatusCode, body)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// ok
+	case http.StatusUnauthorized: // 401, "Unauthorized" should be "Unauthenticated"
+		return nil, ErrUnauthenticated
+	case http.StatusForbidden:
+		return nil, ErrUnauthorized
+	case http.StatusBadRequest:
+		return nil, ErrBadRequest
+	case http.StatusNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
 	}
 
 	var paymentRequest = &PaymentRequest{}
@@ -81,8 +92,19 @@ func (store *Store) GetPaymentRequest(id string) (*PaymentRequest, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("response status: %d: %s", resp.StatusCode, body)
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// ok
+	case http.StatusUnauthorized: // 401, "Unauthorized" should be "Unauthenticated"
+		return nil, ErrUnauthenticated
+	case http.StatusForbidden:
+		return nil, ErrUnauthorized
+	case http.StatusBadRequest:
+		return nil, ErrBadRequest
+	case http.StatusNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
 	}
 
 	var paymentRequest = &PaymentRequest{}

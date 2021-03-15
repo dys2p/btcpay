@@ -2,6 +2,7 @@ package btcpay
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,13 +10,20 @@ import (
 	"time"
 )
 
+var ErrUnauthenticated = errors.New("unauthenticated")
+var ErrUnauthorized = errors.New("unauthorized")
+var ErrBadRequest = errors.New("bad request")
+var ErrNotFound = errors.New("not found")
+
 type Store struct {
 	API           *API   `json:"-"`
 	ID            string `json:"id"`
 	WebhookSecret string `json:"webhookSecret"`
 }
 
-// LoadStore unmarshals a json config file into a Store. If the file doesn't exist, it is created using CreateStoreConfig.
+// LoadStore unmarshals a json config file into a Store.
+// If the file doesn't exist, it is created and an error is returned.
+// If the file exists, then CheckAuth is called and the result is returned.
 func LoadStore(api *API, jsonPath string) (*Store, error) {
 	var store = &Store{
 		API: api,
@@ -23,7 +31,10 @@ func LoadStore(api *API, jsonPath string) (*Store, error) {
 	data, err := os.ReadFile(jsonPath)
 	switch {
 	case err == nil:
-		return store, json.Unmarshal(data, store)
+		if err := json.Unmarshal(data, store); err != nil {
+			return nil, err
+		}
+		return store, store.CheckAuth()
 	case os.IsNotExist(err):
 		return nil, CreateStoreConfig(jsonPath)
 	default:
@@ -42,6 +53,18 @@ func CreateStoreConfig(jsonPath string) error {
 		return err
 	}
 	return fmt.Errorf("created empty config file: %s", jsonPath)
+}
+
+// CheckAuth checks authentication and authorization by performing bogus CreateInvoice and GetInvoice calls and checking the result.
+// It returns ErrUnauthenticated, ErrUnauthorized or nil.
+func (store *Store) CheckAuth() error {
+	if _, err := store.CreateInvoice(nil); err != ErrBadRequest {
+		return err
+	}
+	if _, err := store.GetInvoice("not-existing"); err != ErrNotFound {
+		return err
+	}
+	return nil
 }
 
 func (store *Store) DoRequest(method string, path string, body io.Reader) (*http.Response, error) {
