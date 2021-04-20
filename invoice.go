@@ -1,19 +1,11 @@
 package btcpay
 
-import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-)
-
 const (
 	InvoiceNew        string = "New"
-	InvoiceProcessing        = "Processing"
-	InvoiceExpired           = "Expired"
-	InvoiceInvalid           = "Invalid"
-	InvoiceSettled           = "Settled"
+	InvoiceProcessing string = "Processing"
+	InvoiceExpired    string = "Expired"
+	InvoiceInvalid    string = "Invalid"
+	InvoiceSettled    string = "Settled"
 )
 
 // SpeedPolicy defines when an invoice is considered confirmed.
@@ -21,9 +13,9 @@ type SpeedPolicy string
 
 const (
 	HighSpeed      SpeedPolicy = "HighSpeed"      // consider the invoice confirmed when the payment transaction has >= 0 confirmations (i.e. as soon as it is visible on the blockchain)
-	MediumSpeed                = "MediumSpeed"    // consider the invoice confirmed when the payment transaction has >= 1 confirmation
-	LowMediumSpeed             = "LowMediumSpeed" // consider the invoice confirmed when the payment transaction has >= 2 confirmations
-	LowSpeed                   = "LowSpeed"       // consider the invoice confirmed when the payment transaction has >= 6 confirmations
+	MediumSpeed    SpeedPolicy = "MediumSpeed"    // consider the invoice confirmed when the payment transaction has >= 1 confirmation
+	LowMediumSpeed SpeedPolicy = "LowMediumSpeed" // consider the invoice confirmed when the payment transaction has >= 2 confirmations
+	LowSpeed       SpeedPolicy = "LowSpeed"       // consider the invoice confirmed when the payment transaction has >= 6 confirmations
 )
 
 type Invoice struct {
@@ -57,73 +49,4 @@ type InvoiceCheckout struct {
 	PaymentTolerance  float64     `json:"paymentTolerance,omitempty"`
 	RedirectURL       string      `json:"redirectURL,omitempty"`
 	DefaultLanguage   string      `json:"defaultLanguage,omitempty"`
-}
-
-func (store *Store) CreateInvoice(request *InvoiceRequest) (*Invoice, error) {
-
-	payload, err := json.Marshal(request)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := store.DoRequest(http.MethodPost, "invoices", bytes.NewBuffer(payload))
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	switch resp.StatusCode {
-	case http.StatusOK:
-		// ok
-	case http.StatusUnauthorized: // 401, "Unauthorized" should be "Unauthenticated"
-		return nil, ErrUnauthenticated
-	case http.StatusForbidden:
-		return nil, ErrUnauthorized
-	case http.StatusBadRequest:
-		return nil, ErrBadRequest
-	case http.StatusNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
-	}
-
-	var invoice = &Invoice{}
-	return invoice, json.Unmarshal(body, invoice)
-}
-
-func (store *Store) GetInvoice(id string) (*Invoice, error) {
-
-	resp, err := store.DoRequest(http.MethodGet, fmt.Sprintf("invoices/%s", id), nil)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	switch resp.StatusCode {
-	case http.StatusOK:
-		// ok
-	case http.StatusUnauthorized: // 401, "Unauthorized" should be "Unauthenticated"
-		return nil, ErrUnauthenticated
-	case http.StatusForbidden:
-		return nil, ErrUnauthorized
-	case http.StatusBadRequest:
-		return nil, ErrBadRequest
-	case http.StatusNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
-	}
-
-	var invoice = &Invoice{}
-	return invoice, json.Unmarshal(body, invoice)
 }

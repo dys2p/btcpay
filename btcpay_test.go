@@ -18,7 +18,7 @@ func TestInvoice(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	store, err := LoadStore(api, "store.json")
+	store, err := LoadServerStore(api, "store.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +76,7 @@ func TestPaymentRequest(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	store, err := LoadStore(api, "store.json")
+	store, err := LoadServerStore(api, "store.json")
 	if err != nil {
 		t.Fatal(err)
 	}

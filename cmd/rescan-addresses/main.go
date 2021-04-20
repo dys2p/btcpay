@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 
-	btcpayStore, err := btcpay.LoadStore(btcpayAPI, "store.json")
+	btcpayStore, err := btcpay.LoadServerStore(btcpayAPI, "store.json")
 	if err != nil {
 		log.Printf("error loading btcpay store: %v", err)
 		return
