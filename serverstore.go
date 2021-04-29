@@ -27,7 +27,6 @@ type ServerStore struct {
 
 // LoadServerStore unmarshals a json config file into a ServerStore.
 // If the file doesn't exist, it is created and an error is returned.
-// If the file exists, then CheckAuth is called and the result is returned.
 func LoadServerStore(api *API, jsonPath string) (*ServerStore, error) {
 	var store = &ServerStore{
 		API: api,
@@ -35,10 +34,7 @@ func LoadServerStore(api *API, jsonPath string) (*ServerStore, error) {
 	data, err := os.ReadFile(jsonPath)
 	switch {
 	case err == nil:
-		if err := json.Unmarshal(data, store); err != nil {
-			return nil, err
-		}
-		return store, store.CheckAuth()
+		return store, json.Unmarshal(data, store)
 	case os.IsNotExist(err):
 		return nil, CreateStoreConfig(jsonPath)
 	default:
@@ -59,9 +55,9 @@ func CreateStoreConfig(jsonPath string) error {
 	return fmt.Errorf("created empty config file: %s", jsonPath)
 }
 
-// CheckAuth checks authentication and authorization by performing bogus CreateInvoice and GetInvoice calls and checking the result.
+// CheckInvoiceAuth checks authentication and authorization by performing bogus CreateInvoice and GetInvoice calls and checking the result.
 // It returns ErrUnauthenticated, ErrUnauthorized or nil.
-func (store *ServerStore) CheckAuth() error {
+func (store *ServerStore) CheckInvoiceAuth() error {
 	if _, err := store.CreateInvoice(nil); err != ErrBadRequest {
 		return err
 	}

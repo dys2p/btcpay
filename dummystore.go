@@ -19,7 +19,7 @@ func NewDummyStore() *DummyStore {
 	}
 }
 
-func (*DummyStore) CheckAuth() error {
+func (*DummyStore) CheckInvoiceAuth() error {
 	return nil
 }
 

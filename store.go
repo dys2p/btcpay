@@ -6,7 +6,7 @@ import (
 )
 
 type Store interface {
-	CheckAuth() error
+	CheckInvoiceAuth() error
 	CreateInvoice(request *InvoiceRequest) (*Invoice, error)
 	CreatePaymentRequest(request *PaymentRequestRequest) (*PaymentRequest, error)
 	DoRequest(method string, path string, body io.Reader) (*http.Response, error)

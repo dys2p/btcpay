@@ -68,7 +68,7 @@ func (api *API) PaymentRequestLink(id string) string {
 	return fmt.Sprintf("%s/payment-requests/%s", api.URI, id)
 }
 
-// GetServerStatus requires no specific permissions.
+// GetServerStatus requires successful authentication, but no specific permissions.
 func (api *API) GetServerStatus() (*ServerStatus, error) {
 
 	resp, err := api.DoRequest(http.MethodGet, "server/info", nil)
