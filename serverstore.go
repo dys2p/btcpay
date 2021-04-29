@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 )
 
 var ErrUnauthenticated = errors.New("unauthenticated")
@@ -85,11 +84,6 @@ func (store *ServerStore) CreateInvoice(request *InvoiceRequest) (*Invoice, erro
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// ok
@@ -103,6 +97,11 @@ func (store *ServerStore) CreateInvoice(request *InvoiceRequest) (*Invoice, erro
 		return nil, ErrNotFound
 	default:
 		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
 
 	var invoice = &Invoice{}
@@ -122,11 +121,6 @@ func (store *ServerStore) CreatePaymentRequest(request *PaymentRequestRequest) (
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// ok
@@ -142,27 +136,17 @@ func (store *ServerStore) CreatePaymentRequest(request *PaymentRequestRequest) (
 		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
 	}
 
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	var paymentRequest = &PaymentRequest{}
 	return paymentRequest, json.Unmarshal(body, paymentRequest)
 }
 
 func (store *ServerStore) DoRequest(method string, path string, body io.Reader) (*http.Response, error) {
-
-	req, err := http.NewRequest(
-		method,
-		fmt.Sprintf("%s/api/v1/stores/%s/%s", store.API.URI, store.ID, path),
-		body,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Authorization", fmt.Sprintf("token %s", store.API.UserAPIKey))
-	req.Header.Add("Content-Type", "application/json")
-
-	return (&http.Client{
-		Timeout: 10 * time.Second,
-	}).Do(req)
+	return store.API.DoRequest(method, fmt.Sprintf("stores/%s/%s", store.ID, path), body)
 }
 
 func (store *ServerStore) GetAPI() *API {
@@ -177,11 +161,6 @@ func (store *ServerStore) GetInvoice(id string) (*Invoice, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// ok
@@ -195,6 +174,11 @@ func (store *ServerStore) GetInvoice(id string) (*Invoice, error) {
 		return nil, ErrNotFound
 	default:
 		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
 
 	var invoice = &Invoice{}
@@ -209,11 +193,6 @@ func (store *ServerStore) GetPaymentRequest(id string) (*PaymentRequest, error) 
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// ok
@@ -227,6 +206,11 @@ func (store *ServerStore) GetPaymentRequest(id string) (*PaymentRequest, error) 
 		return nil, ErrNotFound
 	default:
 		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
 
 	var paymentRequest = &PaymentRequest{}

@@ -23,7 +23,10 @@ func TestInvoice(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	created, err := store.CreateInvoice(&InvoiceRequest{Amount: 1.23, Currency: "EUR"})
+	ir := &InvoiceRequest{Amount: 1.23, Currency: "EUR"}
+	ir.OrderID = "Test"
+
+	created, err := store.CreateInvoice(ir)
 	if err != nil {
 		t.Fatal(err)
 	}
