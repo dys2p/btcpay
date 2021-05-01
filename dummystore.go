@@ -3,7 +3,6 @@ package btcpay
 import (
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 )
@@ -23,33 +22,23 @@ func (*DummyStore) CheckInvoiceAuth() error {
 	return nil
 }
 
-func (s *DummyStore) CreateInvoice(request *InvoiceRequest) (*Invoice, error) {
+func (s *DummyStore) CreateInvoice(req *InvoiceRequest) (*Invoice, error) {
 	id := fmt.Sprintf("dummy-invoice-%d", time.Now().UnixNano())
 	invoice := &Invoice{
-		InvoiceRequest:       *request,
+		InvoiceRequest:       *req,
 		ID:                   id,
 		CheckoutLink:         "http://example.com",
 		CreatedTime:          time.Now().Unix(),
-		ExpirationTime:       time.Now().Unix() + int64(60*request.ExpirationMinutes),
-		MonitoringExpiration: time.Now().Unix() + int64(60*request.MonitoringMinutes),
+		ExpirationTime:       time.Now().Unix() + int64(60*req.ExpirationMinutes),
+		MonitoringExpiration: time.Now().Unix() + int64(60*req.MonitoringMinutes),
 		Status:               InvoiceSettled,
 	}
 	s.Invoices[id] = invoice
 	return invoice, nil
 }
 
-func (*DummyStore) CreatePaymentRequest(request *PaymentRequestRequest) (*PaymentRequest, error) {
+func (*DummyStore) CreatePaymentRequest(req *PaymentRequestRequest) (*PaymentRequest, error) {
 	return nil, errors.New("not implemented")
-}
-
-func (*DummyStore) DoRequest(method string, path string, body io.Reader) (*http.Response, error) {
-	return nil, errors.New("not implemented")
-}
-
-func (s *DummyStore) GetAPI() *API {
-	return &API{
-		URI: "https://example.com",
-	}
 }
 
 func (s *DummyStore) GetInvoice(id string) (*Invoice, error) {
@@ -63,6 +52,29 @@ func (s *DummyStore) GetInvoice(id string) (*Invoice, error) {
 
 func (*DummyStore) GetPaymentRequest(id string) (*PaymentRequest, error) {
 	return nil, errors.New("not implemented")
+}
+
+func (*DummyStore) GetServerStatus() (*ServerStatus, error) {
+	return &ServerStatus{
+		Version:                 "dummy",
+		SupportedPaymentMethods: []string{"BTC"},
+		FullySynched:            true,
+		SyncStatuses: []SyncStatus{
+			{
+				CryptoCode:  "BTC",
+				ChainHeight: 1000000,
+				SyncHeight:  1000000,
+			},
+		},
+	}, nil
+}
+
+func (*DummyStore) InvoiceCheckoutLink(id string) string {
+	return id
+}
+
+func (*DummyStore) PaymentRequestLink(id string) string {
+	return id
 }
 
 func (*DummyStore) ProcessWebhook(r *http.Request) (*InvoiceEvent, error) {

@@ -13,17 +13,15 @@ import (
 
 func TestInvoice(t *testing.T) {
 
-	api, err := LoadAPI("api.json")
+	store, err := Load("store.json")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	store, err := LoadServerStore(api, "store.json")
-	if err != nil {
-		t.Fatal(err)
+	ir := &InvoiceRequest{
+		Amount:   1.23,
+		Currency: "EUR",
 	}
-
-	ir := &InvoiceRequest{Amount: 1.23, Currency: "EUR"}
 	ir.OrderID = "Test"
 
 	created, err := store.CreateInvoice(ir)
@@ -74,12 +72,7 @@ func TestInvoice(t *testing.T) {
 
 func TestPaymentRequest(t *testing.T) {
 
-	api, err := LoadAPI("api.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	store, err := LoadServerStore(api, "store.json")
+	store, err := Load("store.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -87,7 +80,7 @@ func TestPaymentRequest(t *testing.T) {
 	request := &PaymentRequestRequest{
 		Amount:   1.23,
 		Currency: "EUR",
-		Title:    "My payment request",
+		Title:    "Test payment request",
 	}
 	request.SetExpiryDays(7)
 

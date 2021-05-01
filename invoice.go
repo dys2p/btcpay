@@ -36,7 +36,6 @@ type InvoiceRequest struct {
 	InvoiceCheckout `json:"checkout,omitempty"`
 }
 
-// Additional information around the invoice that can be supplied.
 type InvoiceMetadata struct {
 	OrderID string `json:"orderId,omitempty"` // if the invoice has been created through a payment request, this is usually the ID of the payment request
 }

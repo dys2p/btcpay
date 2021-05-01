@@ -10,13 +10,7 @@ import (
 
 func main() {
 
-	btcpayAPI, err := btcpay.LoadAPI("api.json")
-	if err != nil {
-		log.Printf("error loading btcpay API: %v", err)
-		return
-	}
-
-	btcpayStore, err := btcpay.LoadServerStore(btcpayAPI, "store.json")
+	store, err := btcpay.Load("store.json")
 	if err != nil {
 		log.Printf("error loading btcpay store: %v", err)
 		return
@@ -24,7 +18,7 @@ func main() {
 
 	for {
 		fmt.Print(".")
-		_, err := btcpayStore.CreateInvoice(&btcpay.InvoiceRequest{
+		_, err := store.CreateInvoice(&btcpay.InvoiceRequest{
 			Amount:   0,
 			Currency: "EUR",
 			InvoiceCheckout: btcpay.InvoiceCheckout{
