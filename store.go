@@ -11,8 +11,8 @@ type Store interface {
 	GetInvoice(id string) (*Invoice, error)
 	GetPaymentRequest(id string) (*PaymentRequest, error)
 	GetServerStatus() (*ServerStatus, error)
-	InvoiceCheckoutLink(id string)
-	PaymentRequestLink(id string)
+	InvoiceCheckoutLink(id string) string
+	PaymentRequestLink(id string) string
 	ProcessWebhook(req *http.Request) (*InvoiceEvent, error)
 }
 
