@@ -31,7 +31,7 @@ func (s *DummyStore) CreateInvoice(req *InvoiceRequest) (*Invoice, error) {
 		CreatedTime:          time.Now().Unix(),
 		ExpirationTime:       time.Now().Unix() + int64(60*req.ExpirationMinutes),
 		MonitoringExpiration: time.Now().Unix() + int64(60*req.MonitoringMinutes),
-		Status:               InvoiceSettled,
+		Status:               InvoiceNew,
 	}
 	s.Invoices[id] = invoice
 	return invoice, nil
