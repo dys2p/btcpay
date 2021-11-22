@@ -21,7 +21,8 @@ var ErrBadRequest = errors.New("bad request")
 var ErrNotFound = errors.New("not found")
 
 type ServerStore struct {
-	ServerURI     string `json:"uri"`        // without "/api" and without trailing slash, used for API access and for links to invoices and payment requests
+	Host          string `json:"uri"`        // without "/api" and without trailing slash, used for API access and user links
+	HostOnion     string `json:"onion"`      // without "/api" and without trailing slash, used for user links only, can be empty
 	UserAPIKey    string `json:"userAPIKey"` // to be created in the BTCPay Server user settings (not in the store settings)
 	ID            string `json:"id"`
 	WebhookSecret string `json:"webhookSecret"`
@@ -59,7 +60,7 @@ func (s *ServerStore) doRequest(method string, path string, body io.Reader) (*ht
 
 	req, err := http.NewRequest(
 		method,
-		fmt.Sprintf("%s/api/v1/%s", s.ServerURI, path),
+		fmt.Sprintf("%s/api/v1/%s", s.Host, path),
 		body,
 	)
 	if err != nil {
@@ -257,11 +258,27 @@ func (s *ServerStore) GetServerStatus() (*ServerStatus, error) {
 }
 
 func (s *ServerStore) InvoiceCheckoutLink(id string) string {
-	return fmt.Sprintf("%s/i/%s", s.ServerURI, id)
+	return fmt.Sprintf("%s/i/%s", s.Host, id)
+}
+
+func (s *ServerStore) InvoiceCheckoutLinkPreferOnion(id string) string {
+	host := s.Host
+	if s.HostOnion != "" {
+		host = s.HostOnion
+	}
+	return fmt.Sprintf("%s/i/%s", host, id)
 }
 
 func (s *ServerStore) PaymentRequestLink(id string) string {
-	return fmt.Sprintf("%s/payment-requests/%s", s.ServerURI, id)
+	return fmt.Sprintf("%s/payment-requests/%s", s.Host, id)
+}
+
+func (s *ServerStore) PaymentRequestLinkPreferOnion(id string) string {
+	host := s.Host
+	if s.HostOnion != "" {
+		host = s.HostOnion
+	}
+	return fmt.Sprintf("%s/payment-requests/%s", host, id)
 }
 
 func (s *ServerStore) ProcessWebhook(r *http.Request) (*InvoiceEvent, error) {

@@ -73,7 +73,15 @@ func (*DummyStore) InvoiceCheckoutLink(id string) string {
 	return id
 }
 
+func (*DummyStore) InvoiceCheckoutLinkPreferOnion(id string) string {
+	return id
+}
+
 func (*DummyStore) PaymentRequestLink(id string) string {
+	return id
+}
+
+func (*DummyStore) PaymentRequestLinkPreferOnion(id string) string {
 	return id
 }
 
