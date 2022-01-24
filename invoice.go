@@ -37,7 +37,7 @@ type InvoiceRequest struct {
 }
 
 type InvoiceMetadata struct {
-	OrderID string `json:"orderId,omitempty"` // if the invoice has been created through a payment request, this is usually the ID of the payment request
+	OrderID string `json:"orderId,omitempty"` // OrderID is stored in the invoice list of your BTCPay server. If the invoice has been created through a payment request, this is the ID of the payment request.
 }
 
 type InvoiceCheckout struct {
@@ -46,6 +46,6 @@ type InvoiceCheckout struct {
 	ExpirationMinutes int         `json:"expirationMinutes,omitempty"` // refers to the "paid" state, when the transaction becomes visible on the blockchain
 	MonitoringMinutes int         `json:"monitoringMinutes,omitempty"`
 	PaymentTolerance  float64     `json:"paymentTolerance,omitempty"`
-	RedirectURL       string      `json:"redirectURL,omitempty"`
+	RedirectURL       string      `json:"redirectURL,omitempty"` // RedirectURL is stored in the invoice list of your BTCPay server and used as href behind OrderID.
 	DefaultLanguage   string      `json:"defaultLanguage,omitempty"`
 }
