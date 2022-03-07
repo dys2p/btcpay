@@ -5,3 +5,7 @@ A simple Go (golang) library for parts of the [BTCPay Greenfield API (v1)](https
 ## Known issues
 
 The BTCPay Greenfield API provides no way to get the real amount which has been paid. Use the [BitPay API](https://github.com/dys2p/bitpay) for that.
+
+## License
+
+This work is dual-licensed under Unlicense and CC0. You can choose between one of them if you use this work.
