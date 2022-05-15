@@ -232,6 +232,7 @@ func (s *ServerStore) GetServerStatus() (*ServerStatus, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	switch resp.StatusCode {
 	case http.StatusOK:
