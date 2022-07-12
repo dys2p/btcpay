@@ -1,5 +1,10 @@
 package btcpay
 
+import (
+	"fmt"
+	"strconv"
+)
+
 const (
 	InvoiceNew        string = "New"
 	InvoiceProcessing string = "Processing"
@@ -48,4 +53,46 @@ type InvoiceCheckout struct {
 	PaymentTolerance  float64     `json:"paymentTolerance,omitempty"`
 	RedirectURL       string      `json:"redirectURL,omitempty"` // RedirectURL is stored in the invoice list of your BTCPay server and used as href behind OrderID.
 	DefaultLanguage   string      `json:"defaultLanguage,omitempty"`
+}
+
+type InvoicePaymentMethod struct {
+	PaymentMethod     string `json:"paymentMethod"` // example: "XMR"
+	CryptoCode        string `json:"cryptoCode"`    // example: "XMR"
+	Destination       string `json:"destination"`
+	PaymentLink       string `json:"paymentLink"`
+	Rate              string `json:"rate"`              // example: "122.7738548555"
+	PaymentMethodPaid string `json:"paymentMethodPaid"` // example: "0.03665275"
+	TotalPaid         string `json:"totalPaid"`         // Total invoice payment, converted into this currency. This is greater than zero even if there is no payment in this crypto. Be careful!
+	Due               string `json:"due"`               // example: "0"
+	Amount            string `json:"amount"`            // Some amount, converted into this currency. This is greater than zero even if there is no payment in this crypto. Be careful!
+	NetworkFee        string `json:"networkFee"`
+	Payments          []struct {
+		ID           string `json:"id"`
+		ReceivedDate int    `json:"receivedDate"` // unix timestamp
+		Value        string `json:"value"`        // example: "0.036652750000"
+		Fee          string `json:"fee"`          // example: "0.0000000003"
+		Status       string `json:"status"`       // example: "Settled"
+		Destination  string `json:"destination"`
+	} `json:"payments"`
+	Activated      bool `json:"activated"`
+	AdditionalData struct {
+		ProvidedComment          string `json:"providedComment"`
+		ConsumedLightningAddress string `json:"consumedLightningAddress"`
+	} `json:"additionalData"`
+}
+
+// ValidateRates returns an error if the exchange rate for the given cryptoCode is above the max rate.
+func ValidateRate(methods []InvoicePaymentMethod, cryptoCode string, maxRate float64) error {
+	for _, method := range methods {
+		if method.CryptoCode == cryptoCode {
+			rate, err := strconv.ParseFloat(method.Rate, 64)
+			if err != nil {
+				return err
+			}
+			if rate > maxRate {
+				return fmt.Errorf("%s rate %.2f exceeds max rate %.2f", method.CryptoCode, rate, maxRate)
+			}
+		}
+	}
+	return nil
 }

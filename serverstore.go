@@ -21,11 +21,12 @@ var ErrBadRequest = errors.New("bad request")
 var ErrNotFound = errors.New("not found")
 
 type ServerStore struct {
-	Host          string `json:"uri"`        // without "/api" and without trailing slash, used for API access and user links
-	HostOnion     string `json:"onion"`      // without "/api" and without trailing slash, used for user links only, can be empty
-	UserAPIKey    string `json:"userAPIKey"` // to be created in the BTCPay Server user settings (not in the store settings)
-	ID            string `json:"id"`
-	WebhookSecret string `json:"webhookSecret"`
+	Host          string             `json:"uri"`        // without "/api" and without trailing slash, used for API access and user links
+	HostOnion     string             `json:"onion"`      // without "/api" and without trailing slash, used for user links only, can be empty
+	UserAPIKey    string             `json:"userAPIKey"` // to be created in the BTCPay Server user settings (not in the store settings)
+	ID            string             `json:"id"`
+	WebhookSecret string             `json:"webhookSecret"`
+	MaxRates      map[string]float64 `json:"maxRates"` // example: {"XMR": 200, "BTC": 50000}
 }
 
 // Load unmarshals a json config file into a ServerStore.
@@ -193,6 +194,34 @@ func (s *ServerStore) GetInvoice(id string) (*Invoice, error) {
 	return invoice, json.Unmarshal(body, invoice)
 }
 
+func (s *ServerStore) GetInvoicePaymentMethods(id string) ([]InvoicePaymentMethod, error) {
+
+	resp, err := s.doRequest(http.MethodGet, fmt.Sprintf("stores/%s/invoices/%s/payment-methods", s.ID, id), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// ok
+	case http.StatusForbidden: // 403
+		return nil, ErrUnauthorized
+	case http.StatusNotFound: // 404
+		return nil, ErrNotFound
+	default:
+		return nil, fmt.Errorf("response status: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var invoice = []InvoicePaymentMethod{}
+	return invoice, json.Unmarshal(body, &invoice)
+}
+
 func (s *ServerStore) GetPaymentRequest(id string) (*PaymentRequest, error) {
 
 	resp, err := s.doRequest(http.MethodGet, fmt.Sprintf("stores/%s/payment-requests/%s", s.ID, id), nil)
@@ -309,6 +338,17 @@ func (s *ServerStore) ProcessWebhook(r *http.Request) (*InvoiceEvent, error) {
 	// mitigate BTCPayServer misconfigurations by checking the store ID
 	if event.StoreID != s.ID {
 		return nil, fmt.Errorf("invoice store ID %s does not match selected store ID %s", event.StoreID, s.ID)
+	}
+
+	// mitigate invalid rates
+	paymentMethods, err := s.GetInvoicePaymentMethods(event.InvoiceID)
+	if err != nil {
+		return nil, err
+	}
+	for cryptoCode, maxRate := range s.MaxRates {
+		if err := ValidateRate(paymentMethods, cryptoCode, maxRate); err != nil {
+			return nil, err
+		}
 	}
 
 	return event, err
