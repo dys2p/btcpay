@@ -88,6 +88,10 @@ func (s *ServerStore) CheckInvoiceAuth() error {
 	return nil
 }
 
+// CreateInvoice creates an invoice which can be paid by the customer.
+// It is recommended to set InvoiceRequest.InvoiceMetadata.OrderID in order to
+// identify the order in both a webhook and in your bookkeeping.
+// Alternatively you can store the btcpay invoice ID in your order database.
 func (s *ServerStore) CreateInvoice(req *InvoiceRequest) (*Invoice, error) {
 
 	payload, err := json.Marshal(req)

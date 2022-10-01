@@ -12,6 +12,8 @@ const (
 	EventInvoiceSettled         EventType = "InvoiceSettled"
 )
 
+// An InvoiceEvent is sent by a webhook. You can use GetInvoice to obtain the
+// full invoice, which includes your custom OrderID.
 type InvoiceEvent struct {
 	DeliveryID         string    `json:"deliveryId"`
 	InvoiceID          string    `json:"invoiceId"`
