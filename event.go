@@ -7,6 +7,7 @@ const (
 	EventInvoiceCreated         EventType = "InvoiceCreated"
 	EventInvoiceExpired         EventType = "InvoiceExpired"
 	EventInvoiceInvalid         EventType = "InvoiceInvalid"
+	EventInvoicePaymentSettled  EventType = "InvoicePaymentSettled"
 	EventInvoiceProcessing      EventType = "InvoiceProcessing"
 	EventInvoiceReceivedPayment EventType = "InvoiceReceivedPayment"
 	EventInvoiceSettled         EventType = "InvoiceSettled"
