@@ -51,8 +51,8 @@ type InvoiceCheckout struct {
 	ExpirationMinutes int         `json:"expirationMinutes,omitempty"` // refers to the "paid" state, when the transaction becomes visible on the blockchain
 	MonitoringMinutes int         `json:"monitoringMinutes,omitempty"`
 	PaymentTolerance  float64     `json:"paymentTolerance,omitempty"`
-	RedirectURL       string      `json:"redirectURL,omitempty"` // RedirectURL is stored in the invoice list of your BTCPay server and used as href behind OrderID.
-	DefaultLanguage   string      `json:"defaultLanguage,omitempty"`
+	RedirectURL       string      `json:"redirectURL,omitempty"`     // RedirectURL is stored in the invoice list of your BTCPay server and used as href behind OrderID.
+	DefaultLanguage   string      `json:"defaultLanguage,omitempty"` // see https://github.com/btcpayserver/btcpayserver/tree/master/BTCPayServer/wwwroot/locales
 }
 
 type InvoicePaymentMethod struct {
