@@ -26,7 +26,7 @@ type ServerStore struct {
 	UserAPIKey    string             `json:"userAPIKey"` // to be created in the BTCPay Server user settings (not in the store settings)
 	ID            string             `json:"id"`
 	WebhookSecret string             `json:"webhookSecret"`
-	MaxRates      map[string]float64 `json:"maxRates"` // example: {"XMR": 200, "BTC": 50000}
+	MaxRates      map[string]float64 `json:"maxRates"` // example: {"XMR": 1000, "BTC": 500000}
 }
 
 // Load unmarshals a json config file into a ServerStore.
