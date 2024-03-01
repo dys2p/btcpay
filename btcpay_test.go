@@ -49,8 +49,11 @@ func TestInvoice(t *testing.T) {
 		"type": "InvoiceCreated",
 		"timestamp": 1610000000,
 		"storeId": "%s",
-		"invoiceId": "%s"
-	}`, store.ID, got.ID))
+		"invoiceId": "%s",
+		"metadata": {
+			"orderId": "%s"
+		}
+	}`, store.ID, got.ID, got.InvoiceMetadata.OrderID))
 
 	var webhookRequest = &http.Request{
 		Body:   io.NopCloser(bytes.NewReader(body)),
@@ -66,6 +69,10 @@ func TestInvoice(t *testing.T) {
 	}
 
 	if event.StoreID != store.ID || event.Type != EventInvoiceCreated || event.InvoiceID != got.ID {
+		t.Fail()
+	}
+
+	if event.InvoiceMetadata.OrderID != got.InvoiceMetadata.OrderID {
 		t.Fail()
 	}
 }
