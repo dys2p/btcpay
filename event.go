@@ -13,6 +13,14 @@ const (
 	EventInvoiceSettled         EventType = "InvoiceSettled"
 )
 
+type PaymentStatus string
+
+const (
+	PaymentInvalid    PaymentStatus = "Invalid"
+	PaymentProcessing PaymentStatus = "Processing"
+	PaymentSettled    PaymentStatus = "Settled"
+)
+
 // An InvoiceEvent is sent by a webhook.
 // You can find your custom OrderID in InvoiceMetadata or use GetInvoice to obtain the full invoice.
 type InvoiceEvent struct {
@@ -29,12 +37,21 @@ type InvoiceEvent struct {
 	// InvoiceInvalid and InvoiceSettled only
 	ManuallyMarked bool `json:"manuallyMarked"`
 
-	// InvoiceReceivedPayment only
-	AfterExpiration bool `json:"afterExpiration"` // whether this payment has been sent after the invoice expired
+	// InvoiceReceivedPayment and InvoicePaymentSettled only
+	AfterExpiration bool     `json:"afterExpiration"` // whether this payment has been sent after the invoice expired
+	PaymentMethodID string   `json:"paymentMethodId"` // what payment method was used for this payment
+	Payment         struct { // details about the payment
+		ID           string        `json:"id"`           // a unique identifier for this payment
+		ReceivedDate int           `json:"receivedDate"` // the date the payment was recorded
+		Value        string        `json:"value"`        // the value of the payment
+		Fee          string        `json:"fee"`          // the fee paid for the payment
+		Status       PaymentStatus `json:"status"`       // the status of the payment
+		Destination  string        `json:"destination"`  // the destination the payment was made to
+	} `json:"payment"`
 
 	// InvoiceExpired only
 	PartiallyPaid bool `json:"partiallyPaid"`
 
-	// InvoiceProcessing only
+	// InvoiceProcessing and InvoiceSettled only
 	OverPaid bool `json:"overPaid"`
 }
