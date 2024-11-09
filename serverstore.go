@@ -355,5 +355,5 @@ func (s *ServerStore) ProcessWebhook(r *http.Request) (*InvoiceEvent, error) {
 		}
 	}
 
-	return event, err
+	return event, nil
 }
