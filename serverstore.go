@@ -324,7 +324,7 @@ func (s *ServerStore) ProcessWebhook(r *http.Request) (*InvoiceEvent, error) {
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("reading body: %w", err)
 	}
 
 	var mac = hmac.New(sha256.New, []byte(s.WebhookSecret))
@@ -336,7 +336,7 @@ func (s *ServerStore) ProcessWebhook(r *http.Request) (*InvoiceEvent, error) {
 
 	var event = &InvoiceEvent{}
 	if err := json.Unmarshal(body, event); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unmarshaling body: %w", err)
 	}
 
 	// mitigate BTCPayServer misconfigurations by checking the store ID
@@ -347,11 +347,11 @@ func (s *ServerStore) ProcessWebhook(r *http.Request) (*InvoiceEvent, error) {
 	// mitigate invalid rates
 	paymentMethods, err := s.GetInvoicePaymentMethods(event.InvoiceID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting payment methods from invoice: %w", err)
 	}
 	for cryptoCode, maxRate := range s.MaxRates {
 		if err := ValidateRate(paymentMethods, cryptoCode, maxRate); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("validating rate: %w", err)
 		}
 	}
 
