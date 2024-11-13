@@ -15,10 +15,12 @@ import (
 	"time"
 )
 
-var ErrUnauthenticated = errors.New("unauthenticated")
-var ErrUnauthorized = errors.New("unauthorized")
-var ErrBadRequest = errors.New("bad request")
-var ErrNotFound = errors.New("not found")
+var (
+	ErrUnauthenticated = errors.New("unauthenticated")
+	ErrUnauthorized    = errors.New("unauthorized")
+	ErrBadRequest      = errors.New("bad request")
+	ErrNotFound        = errors.New("not found")
+)
 
 type ServerStore struct {
 	Host          string             `json:"uri"`        // without "/api" and without trailing slash, used for API access and user links
